@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="km" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#080c16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="QR Studio">
+  <meta name="description" content="កម្មវិធីបង្កើត QR Code ទំនើប រហ័ស និងងាយស្រួលប្រើប្រាស់។ Generate beautiful QR codes instantly with custom colors, styles, and logos.">
+  
+  <title>QR Studio Pro - កម្មវិធីបង្កើត QR Code ភ្លាមៗ</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Kantumruy Pro for Khmer -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/svg+xml" href="./assets/icon.svg">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <!-- Ambient Moving Aurora Background Elements -->
+  <div class="ambient-glow-wrapper" aria-hidden="true">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+  </div>
+
+  <!-- Fullscreen Confetti Canvas -->
+  <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
+
+  <!-- App Shell -->
+  <div class="app-container">
+    
+    <!-- App Navigation Header (Mobile App Bar) -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <img src="./assets/icon.svg" alt="QR Studio Logo" width="34" height="34">
+        </div>
+        <div class="brand-text">
+          <h1>QR Studio</h1>
+          <span class="badge-pro">PRO</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- History Drawer Button -->
+        <button id="historyBtn" class="icon-btn ripple-btn" title="ប្រវត្តិ (History)" aria-label="ប្រវត្តិ QR">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span id="historyBadge" class="badge-count hidden">0</span>
+        </button>
+
+        <!-- Dark / Light Theme Toggle -->
+        <button id="themeToggleBtn" class="icon-btn ripple-btn" title="ប្ដូរពន្លឺ (Theme)" aria-label="Toggle Theme">
+          <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Layout (Mobile App Flow & Desktop Dual Column) -->
+    <main class="app-main">
+
+      <!-- Left Column: Inputs & Controls -->
+      <section class="left-panel" id="sectionInputs">
+        
+        <!-- Type Selection Tabs (Segmented Control with Animated Slider Indicator) -->
+        <div class="tabs-scroll-container">
+          <nav class="segmented-tabs" id="segmentedTabs" role="tablist" aria-label="ប្រភេទ QR Code">
+            <div class="tab-slider" id="tabSlider"></div>
+            <button class="tab-btn active ripple-btn" data-type="url" role="tab" aria-selected="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+              <span>Link</span>
+            </button>
+            <button class="tab-btn ripple-btn" data-type="text" role="tab" aria-selected="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="21" y1="10" x2="3" y2="10"></line>
+                <line x1="21" y1="6" x2="3" y2="6"></line>
+                <line x1="21" y1="14" x2="3" y2="14"></line>
+                <line x1="21" y1="18" x2="7" y2="18"></line>
+              </svg>
+              <span>Text</span>
+            </button>
+            <button class="tab-btn ripple-btn" data-type="wifi" role="tab" aria-selected="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                <line x1="12" y1="20" x2="12.01" y2="20"></line>
+              </svg>
+              <span>Wi-Fi</span>
+            </button>
+            <button class="tab-btn ripple-btn" data-type="vcard" role="tab" aria-selected="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>Contact</span>
+            </button>
+            <button class="tab-btn ripple-btn" data-type="email" role="tab" aria-selected="false">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <span>Email</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- Input Form Card with Glassmorphic Shimmer -->
+        <div class="card form-card">
+
+          <!-- 1. URL Input Form -->
+          <div id="form-url" class="type-form active">
+            <div class="field-header">
+              <label for="inputUrl">តំណភ្ជាប់គេហទំព័រ ឬ Social Media (URL)</label>
+              <button type="button" id="pasteUrlBtn" class="field-action-btn ripple-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+                <span>Paste Link</span>
+              </button>
+            </div>
+            <div class="input-with-icon">
+              <span class="input-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </span>
+              <input type="url" id="inputUrl" placeholder="https://example.com ឬ fb.me/..." value="https://google.com" autocomplete="off" spellcheck="false">
+              <button type="button" id="clearUrlBtn" class="clear-btn" title="លុប">✕</button>
+            </div>
+            <div class="quick-chips">
+              <span class="chip-label">គំរូទូទៅ៖</span>
+              <button type="button" class="chip ripple-btn" data-sample="https://facebook.com">Facebook</button>
+              <button type="button" class="chip ripple-btn" data-sample="https://t.me/">Telegram</button>
+              <button type="button" class="chip ripple-btn" data-sample="https://youtube.com">YouTube</button>
+              <button type="button" class="chip ripple-btn" data-sample="https://tiktok.com">TikTok</button>
+            </div>
+          </div>
+
+          <!-- 2. Text Input Form -->
+          <div id="form-text" class="type-form">
+            <div class="field-header">
+              <label for="inputText">វាយសារ ឬអត្ថបទរបស់អ្នក</label>
+              <span id="textCharCount" class="char-count">0 អក្សរ</span>
+            </div>
+            <textarea id="inputText" rows="4" placeholder="សូមសរសេរអត្ថបទ សារ ឬកំណត់ចំណាំនៅទីនេះ..."></textarea>
+          </div>
+
+          <!-- 3. Wi-Fi Input Form -->
+          <div id="form-wifi" class="type-form">
+            <div class="input-group">
+              <label for="wifiSsid">ឈ្មោះ Wi-Fi (SSID)</label>
+              <div class="input-with-icon">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                    <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                    <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                  </svg>
+                </span>
+                <input type="text" id="wifiSsid" placeholder="ឧទាហរណ៍៖ MyHome_WiFi">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="wifiPass">លេខសម្ងាត់ (Password)</label>
+              <div class="input-with-icon">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                </span>
+                <input type="text" id="wifiPass" placeholder="វាយលេខសម្ងាត់ Wi-Fi">
+              </div>
+            </div>
+
+            <div class="grid-2-cols">
+              <div class="input-group">
+                <label for="wifiSec">ប្រភេទសុវត្ថិភាព (Security)</label>
+                <select id="wifiSec" class="app-select">
+                  <option value="WPA" selected>WPA / WPA2 / WPA3</option>
+                  <option value="WEP">WEP</option>
+                  <option value="nopass">គ្មានលេខសម្ងាត់ (Open)</option>
+                </select>
+              </div>
+
+              <div class="input-group checkbox-group">
+                <label class="checkbox-label" for="wifiHidden">
+                  <input type="checkbox" id="wifiHidden">
+                  <span>បណ្ដាញលាក់ (Hidden)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. vCard Contact Form -->
+          <div id="form-vcard" class="type-form">
+            <div class="grid-2-cols">
+              <div class="input-group">
+                <label for="vcardFirst">ឈ្មោះ (First Name)</label>
+                <input type="text" id="vcardFirst" placeholder="សុខ">
+              </div>
+              <div class="input-group">
+                <label for="vcardLast">ត្រកូល (Last Name)</label>
+                <input type="text" id="vcardLast" placeholder="ជា">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="vcardPhone">លេខទូរស័ព្ទ (Phone Number)</label>
+              <div class="input-with-icon">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                  </svg>
+                </span>
+                <input type="tel" id="vcardPhone" placeholder="+855 12 345 678">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="vcardEmail">អ៊ីមែល (Email)</label>
+              <div class="input-with-icon">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                </span>
+                <input type="email" id="vcardEmail" placeholder="sokha@example.com">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="vcardOrg">ក្រុមហ៊ុន / ស្ថាប័ន (Organization)</label>
+              <input type="text" id="vcardOrg" placeholder="Company Name">
+            </div>
+          </div>
+
+          <!-- 5. Email Form -->
+          <div id="form-email" class="type-form">
+            <div class="input-group">
+              <label for="emailTo">ផ្ញើទៅកាន់ (To Email)</label>
+              <input type="email" id="emailTo" placeholder="recipient@example.com">
+            </div>
+            <div class="input-group">
+              <label for="emailSubject">ប្រធានបទ (Subject)</label>
+              <input type="text" id="emailSubject" placeholder="សូមស្វាគមន៍...">
+            </div>
+            <div class="input-group">
+              <label for="emailBody">ខ្លឹមសារសារ (Message)</label>
+              <textarea id="emailBody" rows="3" placeholder="វាយខ្លឹមសារអ៊ីមែលនៅទីនេះ..."></textarea>
+            </div>
+          </div>
+
+        </div> <!-- End of Form Card -->
+
+        <!-- Customization Collapsible / Section -->
+        <div class="card customization-card" id="sectionCustomize">
+          <div class="section-title">
+            <div class="title-with-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              <span>រចនា & តុបតែង (Style & Colors)</span>
+            </div>
+            <span class="subtitle">ប្តូរពណ៌ និងម៉ូត QR Code តាមចិត្ត</span>
+          </div>
+
+          <!-- Preset Color Palettes -->
+          <div class="custom-row">
+            <label class="row-label">ពណ៌ពេញនិយម (Color Presets)</label>
+            <div class="palette-options">
+              <button type="button" class="palette-btn active ripple-btn" data-fg="#0f172a" data-bg="#ffffff" title="Classic Obsidian">
+                <span class="circle-preview" style="background: linear-gradient(135deg, #0f172a 50%, #ffffff 50%);"></span>
+                <span>បុរាណ</span>
+              </button>
+              <button type="button" class="palette-btn ripple-btn" data-fg="#4f46e5" data-bg="#ffffff" title="Indigo Modern">
+                <span class="circle-preview" style="background: linear-gradient(135deg, #4f46e5 50%, #ffffff 50%);"></span>
+                <span>Indigo</span>
+              </button>
+              <button type="button" class="palette-btn ripple-btn" data-fg="#0284c7" data-bg="#ffffff" title="Ocean Blue">
+                <span class="circle-preview" style="background: linear-gradient(135deg, #0284c7 50%, #ffffff 50%);"></span>
+                <span>ផ្ទៃមេឃ</span>
+              </button>
+              <button type="button" class="palette-btn ripple-btn" data-fg="#059669" data-bg="#ffffff" title="Emerald Green">
+                <span class="circle-preview" style="background: linear-gradient(135deg, #059669 50%, #ffffff 50%);"></span>
+                <span>បៃតង</span>
+              </button>
+              <button type="button" class="palette-btn ripple-btn" data-fg="#e11d48" data-bg="#ffffff" title="Crimson Rose">
+                <span class="circle-preview" style="background: linear-gradient(135deg, #e11d48 50%, #ffffff 50%);"></span>
+                <span>ក្រហម</span>
+              </button>
+              <button type="button" class="palette-btn ripple-btn" data-fg="#7c3aed" data-bg="#ffffff" title="Royal Purple">
+                <span class="circle-preview" style="background: linear-gradient(135deg, #7c3aed 50%, #ffffff 50%);"></span>
+                <span>ស្វាយ</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom Colors & Shapes Grid -->
+          <div class="grid-2-cols">
+            <!-- Custom Color Pickers -->
+            <div class="color-picker-box">
+              <label for="colorDots">ពណ៌ QR Code</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="colorDots" value="#0f172a">
+                <span id="colorDotsHex" class="hex-text">#0F172A</span>
+              </div>
+            </div>
+
+            <div class="color-picker-box">
+              <label for="colorBg">ពណ៌ផ្ទៃក្រោយ (Background)</label>
+              <div class="color-input-wrapper">
+                <input type="color" id="colorBg" value="#ffffff">
+                <span id="colorBgHex" class="hex-text">#FFFFFF</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dot Style & Corner Style -->
+          <div class="grid-2-cols mt-3">
+            <div class="input-group">
+              <label for="dotStyle">ម៉ូតចំណុច (Dots Style)</label>
+              <select id="dotStyle" class="app-select">
+                <option value="rounded" selected>កោងមូល (Rounded)</option>
+                <option value="dots">ចំនុចមូល (Dots)</option>
+                <option value="classy">Classy</option>
+                <option value="classy-rounded">Classy Rounded</option>
+                <option value="square">ជ្រុងធម្មតា (Square)</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="cornerStyle">ម៉ូតជ្រុង (Corner Eyes)</label>
+              <select id="cornerStyle" class="app-select">
+                <option value="extra-rounded" selected>មូលខ្លាំង (Extra Rounded)</option>
+                <option value="dot">ចំនុច (Dot)</option>
+                <option value="square">ជ្រុងកែង (Square)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Center Logo Upload / Selection -->
+          <div class="custom-row mt-3">
+            <label class="row-label">ដាក់ Logo នៅចំកណ្ដាល (Center Logo)</label>
+            <div class="logo-selector">
+              <label class="logo-upload-btn ripple-btn" for="logoFileInput">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span>Upload Logo របស់អ្នក</span>
+                <input type="file" id="logoFileInput" accept="image/png, image/jpeg, image/svg+xml, image/webp" hidden>
+              </label>
+
+              <button type="button" id="removeLogoBtn" class="pill-btn remove-logo-btn hidden" title="លុប Logo ចេញ">
+                ✕ លុប Logo
+              </button>
+            </div>
+          </div>
+
+          <!-- Padding / Margin Around QR Code Control -->
+          <div class="custom-row mt-3">
+            <div class="field-header">
+              <label for="marginRange" class="row-label" style="margin-bottom:0;">គម្លាតគែមសងខាង (Padding / Margin)</label>
+              <span id="marginVal" class="hex-text" style="color:var(--primary);">10px</span>
+            </div>
+            <div class="margin-slider-wrapper">
+              <input type="range" id="marginRange" min="0" max="40" step="5" value="10" class="app-range">
+              <div class="margin-chips">
+                <button type="button" class="margin-btn ripple-btn" data-margin="0">គ្មានគែម (0px)</button>
+                <button type="button" class="margin-btn active ripple-btn" data-margin="10">តូច (10px)</button>
+                <button type="button" class="margin-btn ripple-btn" data-margin="20">មធ្យម (20px)</button>
+                <button type="button" class="margin-btn ripple-btn" data-margin="35">ធំ (35px)</button>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- End of Customization Card -->
+
+      </section>
+
+      <!-- Right Column: Live QR Code App Card & Actions -->
+      <section class="right-panel" id="sectionPreview">
+        
+        <!-- App-like Floating Device Card with 3D Tilt Effect -->
+        <div class="qr-preview-wrapper" id="qrPreviewWrapper">
+          
+          <div class="qr-device-card" id="qrDeviceCard">
+            
+            <div class="qr-card-header">
+              <div class="status-indicator">
+                <span class="pulse-dot"></span>
+                <span>LIVE PREVIEW</span>
+              </div>
+              <div class="qr-size-tag" id="currentSizeTag">1000 × 1000 px</div>
+            </div>
+
+            <!-- QR Code Canvas Display Box with Animated Laser Scanner -->
+            <div class="qr-canvas-box" id="qrContainer">
+              <!-- Laser Sweep Animation Line -->
+              <div class="scanner-laser" id="scannerLaser"></div>
+
+              <!-- Rendered dynamically by QR Code Styling -->
+              <div id="qrPlaceholder" class="qr-placeholder">
+                <div class="spinner"></div>
+                <span>កំពុងដំណើរការ...</span>
+              </div>
+            </div>
+
+            <!-- Active Scan Hint -->
+            <div class="qr-scan-hint">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+              </svg>
+              <span>ប្រើកាមេរ៉ាទូរស័ព្ទដើម្បី Scan សាកល្បង</span>
+            </div>
+
+            <!-- Resolution Quality Selector -->
+            <div class="resolution-selector">
+              <span class="res-label">គុណភាពរូបភាព៖</span>
+              <div class="res-chips">
+                <button type="button" class="res-btn ripple-btn" data-res="500">500px</button>
+                <button type="button" class="res-btn active ripple-btn" data-res="1000">1000px HD</button>
+                <button type="button" class="res-btn ripple-btn" data-res="2000">2000px 4K</button>
+              </div>
+            </div>
+
+            <!-- Action Buttons (Native App Style with Ripple Physics) -->
+            <div class="qr-actions-grid">
+              
+              <!-- Primary: Download PNG -->
+              <button id="downloadPngBtn" class="app-btn btn-primary ripple-btn" title="ទាញយកជារូបភាព PNG">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download PNG</span>
+              </button>
+
+              <!-- Secondary: Download SVG -->
+              <button id="downloadSvgBtn" class="app-btn btn-secondary ripple-btn" title="ទាញយកជា Vector SVG មិនបែក">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+                <span>Download SVG</span>
+              </button>
+
+              <!-- Copy Image to Clipboard -->
+              <button id="copyImageBtn" class="app-btn btn-outline ripple-btn" title="Copy រូបភាពទៅ Clipboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Copy រូបភាព</span>
+              </button>
+
+              <!-- Share Button -->
+              <button id="shareBtn" class="app-btn btn-outline ripple-btn" title="ចែករំលែក">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="18" cy="5" r="3"></circle>
+                  <circle cx="6" cy="12" r="3"></circle>
+                  <circle cx="18" cy="19" r="3"></circle>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                <span>Share</span>
+              </button>
+
+            </div>
+
+          </div> <!-- End of Device Card -->
+
+        </div> <!-- End of Preview Wrapper -->
+
+      </section>
+
+    </main>
+
+    <!-- Mobile Native App Bottom Navigation Dock -->
+    <nav class="mobile-app-dock" id="mobileAppDock" aria-label="Mobile Bottom Dock">
+      <button type="button" class="dock-item active" id="dockBtnInput">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
+        <span>បញ្ចូល</span>
+      </button>
+      <button type="button" class="dock-item" id="dockBtnCustomize">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>រចនា</span>
+      </button>
+      <button type="button" class="dock-item" id="dockBtnPreview">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <rect x="7" y="7" width="3" height="3"></rect>
+          <rect x="14" y="7" width="3" height="3"></rect>
+          <rect x="7" y="14" width="3" height="3"></rect>
+        </svg>
+        <span>មើល QR</span>
+      </button>
+      <button type="button" class="dock-item" id="dockBtnHistory">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>ប្រវត្តិ</span>
+      </button>
+      <button type="button" class="dock-item dock-primary" id="dockBtnDownload">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span>ទាញយក</span>
+      </button>
+    </nav>
+
+    <!-- History Bottom Sheet / Drawer -->
+    <aside id="historyDrawer" class="history-drawer" aria-hidden="true">
+      <div class="drawer-backdrop" id="drawerBackdrop"></div>
+      <div class="drawer-content">
+        <div class="drawer-handle"></div>
+        <div class="drawer-header">
+          <div class="drawer-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <h2>ប្រវត្តិ QR Code ថ្មីៗ (Recent History)</h2>
+          </div>
+          <button type="button" id="clearHistoryBtn" class="clear-history-link">សម្អាតទាំងអស់</button>
+        </div>
+
+        <div id="historyList" class="history-list">
+          <div class="empty-history">
+            <p>មិនទាន់មានប្រវត្តិបង្កើត QR Code ទេ</p>
+          </div>
+        </div>
+
+        <div class="drawer-footer">
+          <button type="button" id="closeHistoryBtn" class="app-btn btn-secondary w-full ripple-btn">បិទ</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Floating Toast Notification -->
+    <div id="toast" class="toast-pill" role="alert" aria-live="polite">
+      <span class="toast-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </span>
+      <span class="toast-message" id="toastMessage">បានជោគជ័យ!</span>
+    </div>
+
+    <!-- App Footer -->
+    <footer class="app-footer">
+      <p>ដំណើរការលើ <strong>Cloudflare Pages</strong> ឥតគិតថ្លៃ ១០០%</p>
+    </footer>
+
+  </div> <!-- End of App Container -->
+
+  <!-- Load Local Bundle of QR Code Styling, with Fallback CDN -->
+  <script src="./js/qr-code-styling.js"></script>
+  <script>
+    if (typeof QRCodeStyling === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"><\/script>');
+    }
+  </script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

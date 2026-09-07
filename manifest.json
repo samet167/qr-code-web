@@ -1,0 +1,17 @@
+{
+  "name": "QR Studio - Instant QR Generator",
+  "short_name": "QR Studio",
+  "description": "Generate modern, beautiful QR codes instantly. Custom colors, logos, and high-resolution export.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
